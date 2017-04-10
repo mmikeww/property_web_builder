@@ -1,4 +1,4 @@
-require 'Rets'
+require 'rets'
 module Pwb
   class MlsConnector
     attr_accessor :mls_name
