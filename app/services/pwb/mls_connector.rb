@@ -1,15 +1,15 @@
 require 'rets'
 module Pwb
   class MlsConnector
-    attr_accessor :mls_name
+    attr_accessor :import_source
 
-    def initialize(mls_name)
-      self.mls_name = mls_name
+    def initialize(import_source)
+      # import_source = Pwb::ImportSource.find_by_name mls_name
+      self.import_source = import_source
     end
 
-    def get_property query
-      is = Pwb::ImportSource.find_by_name "interealty"
-      client = Rets::Client.new(is.details)
+    def retrieve query, limit
+      client = Rets::Client.new(import_source.details)
 
       # {
       #   login_url: 'http://ptest.mris.com:6103/ptest/login',
@@ -21,12 +21,14 @@ module Pwb
 
       # $ver = "RETS/1.7.2";
       # $user_agent = "RETS Test/1.0";
-
-      property = client.find :first, {
+      quantity = :all
+      # quantity has to be one of :first or :all
+      # but would rather use limit than :first
+      properties = client.find quantity, {
         search_type: 'Property',
-        class: is.default_property_class,
-        query: query
-        # limit: 1
+        class: import_source.default_property_class,
+        query: query,
+        limit: limit
       }
       # photos = client.objects '*', {
       #   resource: 'Property',
@@ -34,7 +36,7 @@ module Pwb
       #   resource_id: '242502823'
       # }
 
-      return property
+      return properties
     end
 
     
